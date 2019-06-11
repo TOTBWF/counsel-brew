@@ -48,8 +48,8 @@
 
 (ivy-set-actions
  'counsel-brew
- '(("n" (lambda (package) (counsel-brew-command "info")) "info")
-   ("p" (lambda (package) (counsel-brew-command "upgrade")) "upgrade")
+ '(("n" (lambda (package) (counsel-brew-command "info" package)) "info")
+   ("p" (lambda (package) (counsel-brew-command "upgrade" package)) "upgrade")
    ("r" (lambda (package) (counsel-brew-command "reinstall" package)) "reinstall")
    ("u" (lambda (package) (counsel-brew-command "uninstall" package)) "uninstall")))
 
