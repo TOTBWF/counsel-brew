@@ -26,9 +26,8 @@
 
 (defun counsel-brew-list ()
   "List all possible packages to install."
-  (let ((packages (split-string (with-temp-buffer (call-process "brew" nil t nil "desc" "-s" "") (buffer-string)) "\n"))
-        )
-    (mapcar (lambda (package) (split-string package ": ")) packages)))
+  (let ((packages (split-string (with-temp-buffer (call-process "brew" nil t nil "desc" "-s" "") (buffer-string)) "\n")))
+    (mapcar (lambda (package) (cons package (car (split-string package ":")))) packages)))
 
 (defun counsel-brew-command (cmd package)
   "Run brew command CMD on PACKAGE."
@@ -36,7 +35,12 @@
     (progn
       (with-current-buffer brew-buffer
         (erase-buffer)
-        (async-shell-command (format "brew %s %s" cmd (car package)) brew-buffer)))))
+        (async-shell-command (format "brew %s %s" cmd (cdr package)) brew-buffer)))))
+
+(defun counsel-brew-transformer (package)
+  "Ivy transformer for a given PACKAGE."
+  (put-text-property (string-match-p ": " package) (length package) 'face 'font-lock-doc-face package)
+  package)
 
 ;;;###autoload
 (defun counsel-brew ()
@@ -52,6 +56,8 @@
    ("p" (lambda (package) (counsel-brew-command "upgrade" package)) "upgrade")
    ("r" (lambda (package) (counsel-brew-command "reinstall" package)) "reinstall")
    ("u" (lambda (package) (counsel-brew-command "uninstall" package)) "uninstall")))
+
+(ivy-set-display-transformer 'counsel-brew 'counsel-brew-transformer)
 
 
 (provide 'counsel-brew)
